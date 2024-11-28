@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BFHL Backend Interaction</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+    }
+    .result {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+    pre {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>BFHL Backend Interaction</h1>
+
+  <h2>Send a POST Request</h2>
+  <form id="postForm">
+    <label for="dataInput">Enter data (comma-separated values):</label>
+    <input type="text" id="dataInput" placeholder="Example: 1, a, 3, b, c">
+    <button type="submit">Send POST Request</button>
+  </form>
+
+ 
+  <div class="result" id="resultArea">
+    <h3>Results:</h3>
+    <pre id="result"></pre>
+  </div>
+
+  <script>
+    const postForm = document.getElementById("postForm");
+    const getRequest = document.getElementById("getRequest");
+    const resultArea = document.getElementById("result");
+
+    // URL of the backend server
+    const SERVER_URL = "http://localhost:5000/bfhl"; // Update to match your backend port
+
+    // Handle POST request
+    postForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const dataInput = document.getElementById("dataInput").value.trim();
+      
+      if (!dataInput) {
+        resultArea.textContent = "Error: Input cannot be empty.";
+        return;
+      }
+
+      const dataArray = dataInput.split(",").map((item) => item.trim());
+
+      try {
+        console.log("POST Data Sent:", dataArray);
+        const response = await fetch(SERVER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: dataArray }),
+        });
+        const result = await response.json();
+        console.log("POST Response Received:", result);
+        resultArea.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        resultArea.textContent = `Error: ${error.message}`;
+      }
+    });
+
+    // Handle GET request
+    getRequest.addEventListener("click", async () => {
+      try {
+        const response = await fetch(SERVER_URL);
+        const result = await response.json();
+        console.log("GET Response Received:", result);
+        resultArea.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        resultArea.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
